@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: panda-converter-api
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0

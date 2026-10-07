@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl" data-theme="light" data-season="spring">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panda Converter - Powered by Razn</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%90%BC%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"><\/script>
+<style>
+:root{--panda-black:#232323;--panda-white:#fff;--font-display:'Fredoka','Noto Sans Arabic',sans-serif;--font-body:'Noto Sans Arabic',sans-serif;--shadow:0 10px 30px -12px rgba(30,30,30,.18)}
+html[data-season="spring"][data-theme="light"]{--bg:#fbf7f2;--surface:#fff;--surface-2:#f3f8ee;--text:#23241f;--muted:#6b7266;--border:#e4ebdc;--primary:#5f9a5a;--primary-ink:#fff;--accent:#f3a6b3}
+html[data-season="spring"][data-theme="dark"]{--bg:#121712;--surface:#181f17;--surface-2:#1f2a1c;--text:#eef3ea;--muted:#9bab93;--border:#2a3625;--primary:#7ec279;--primary-ink:#0f170f;--accent:#f3a6b3}
+html[data-season="summer"][data-theme="light"]{--bg:#fffaf1;--surface:#fff;--surface-2:#fff4e2;--text:#271f12;--muted:#7a6a4c;--border:#f1e3c6;--primary:#f2994a;--primary-ink:#1c1206;--accent:#2fb1c6}
+html[data-season="summer"][data-theme="dark"]{--bg:#17130a;--surface:#1e1810;--surface-2:#271e10;--text:#fbf1e2;--muted:#b9a780;--border:#352813;--primary:#f6a856;--primary-ink:#1c1206;--accent:#36c4da}
+html[data-season="autumn"][data-theme="light"]{--bg:#fbf4ee;--surface:#fff;--surface-2:#f6e9dd;--text:#2a1c12;--muted:#86684f;--border:#ecd9c4;--primary:#b4552c;--primary-ink:#fff8f2;--accent:#d7a23a}
+html[data-season="autumn"][data-theme="dark"]{--bg:#171009;--surface:#1f1510;--surface-2:#291a11;--text:#f6e9dd;--muted:#c3a37f;--border:#372315;--primary:#d97a46;--primary-ink:#1b0f07;--accent:#e5b84f}
+html[data-season="winter"][data-theme="light"]{--bg:#f5f8fb;--surface:#fff;--surface-2:#eef3f8;--text:#1d2630;--muted:#637182;--border:#dbe6f0;--primary:#3f7cc9;--primary-ink:#fff;--accent:#8fd0d6}
+html[data-season="winter"][data-theme="dark"]{--bg:#0e141c;--surface:#141c26;--surface-2:#1a2533;--text:#eaf1f8;--muted:#90a3b8;--border:#263345;--primary:#6ba6ef;--primary-ink:#0b1420;--accent:#8fe1e6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;transition:background .4s,color .4s}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select{font-family:inherit}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.25}
+.hidden{display:none!important}
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.site-header{position:sticky;top:0;z-index:50;background:var(--surface);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.header-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;max-width:1100px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-name{font-family:var(--font-display);font-size:1.25rem;font-weight:700;color:var(--text)}
+.brand-powered{font-size:.72rem;color:var(--muted);display:block}
+.header-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ctrl-select{background:var(--surface-2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:999px;font-size:.85rem}
+.theme-toggle{display:flex;gap:4px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:4px}
+.theme-toggle button{padding:6px 12px;border-radius:999px;font-size:.85rem;font-weight:600;color:var(--muted)}
+.theme-toggle button[aria-pressed="true"]{background:var(--primary);color:var(--primary-ink)}
+.hero{padding:64px 24px 24px;text-align:center}
+.hero h1{font-size:clamp(2.1rem,5vw,3.2rem);margin-bottom:14px;color:var(--text)}
+.hero p{color:var(--muted);font-size:1.08rem;max-width:520px;margin:0 auto}
+.hero-panda{width:92px;margin:0 auto 18px;animation:float 5s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.upload-section{padding:28px 24px}
+.dropzone{max-width:680px;margin:0 auto;border:2.5px dashed var(--border);border-radius:26px;background:var(--surface);padding:48px 24px;text-align:center;cursor:pointer;transition:.25s}
+.dropzone:hover{border-color:var(--primary);box-shadow:var(--shadow)}
+.dropzone.dragover{border-color:var(--primary);background:var(--surface-2);transform:scale(1.015)}
+.dropzone h3{margin-bottom:6px;color:var(--text)}
+.dropzone .sub{color:var(--muted);margin-bottom:18px}
+.browse-btn{background:var(--primary);color:var(--primary-ink);padding:11px 26px;border-radius:999px;font-weight:600}
+.formats-hint{margin-top:20px;font-size:.76rem;color:var(--muted);line-height:1.9}
+.file-card{max-width:680px;margin:18px auto 0;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px 20px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow)}
+.file-card .ico{font-size:1.8rem}
+.file-card .meta{flex:1;min-width:0}
+.file-card .name{font-weight:600}
+.file-card .sub{font-size:.82rem;color:var(--muted)}
+.file-card .remove{width:32px;height:32px;border-radius:50%;background:var(--surface-2);flex-shrink:0}
+.converter{max-width:680px;margin:18px auto 0;background:var(--surface);border:1px solid var(--border);border-radius:26px;padding:26px;box-shadow:var(--shadow)}
+.converter h3{margin-bottom:18px;color:var(--text)}
+.convert-row{display:flex;gap:14px;align-items:center}
+.convert-col{flex:1}
+.convert-col label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:6px}
+.convert-col .pill{display:block;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-weight:600}
+.convert-arrow{font-size:1.3rem;color:var(--primary)}
+.convert-select{width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-weight:600;color:var(--text)}
+.convert-btn{margin-top:20px;width:100%;background:var(--primary);color:var(--primary-ink);padding:15px;border-radius:999px;font-weight:700;font-size:1rem}
+.convert-btn:disabled{opacity:.5;cursor:not-allowed}
+.progress-wrap{max-width:680px;margin:18px auto 0;background:var(--surface);border:1px solid var(--border);border-radius:26px;padding:26px;text-align:center;box-shadow:var(--shadow)}
+.progress-panda{width:56px;margin:0 auto 12px}
+.progress-track{height:10px;background:var(--surface-2);border-radius:999px;overflow:hidden;margin:16px 0 8px}
+.progress-fill{height:100%;background:var(--primary);width:0%;transition:width .4s}
+.progress-msg{font-size:.88rem;color:var(--muted)}
+.result-card{max-width:680px;margin:18px auto 0;background:var(--surface);border:1px solid var(--border);border-radius:26px;padding:32px 26px;text-align:center;box-shadow:var(--shadow)}
+.result-card .check{width:58px;height:58px;border-radius:50%;background:var(--primary);color:var(--primary-ink);display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 14px}
+.result-files{display:flex;align-items:center;justify-content:center;gap:12px;margin:14px 0 22px;color:var(--muted);flex-wrap:wrap}
+.result-files strong{color:var(--text)}
+.download-btn{display:inline-block;background:var(--primary);color:var(--primary-ink);padding:14px 30px;border-radius:999px;font-weight:700;margin-bottom:12px;text-decoration:none}
+.again-btn{display:block;margin:0 auto;color:var(--muted);font-size:.88rem;text-decoration:underline;padding:8px}
+.error-card{max-width:680px;margin:18px auto 0;background:var(--surface);border:1px solid var(--border);border-radius:26px;padding:28px 26px;text-align:center;box-shadow:var(--shadow)}
+.error-card p{color:var(--muted);margin:8px 0 18px}
+.features{padding:70px 24px 20px}
+.features h2{text-align:center;font-size:1.8rem;margin-bottom:8px;color:var(--text)}
+.features .lede{text-align:center;color:var(--muted);margin-bottom:36px}
+.feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:1000px;margin:0 auto}
+.feature-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px}
+.feature-card .emoji{font-size:1.6rem;margin-bottom:10px}
+.feature-card h3{font-size:1.02rem;margin-bottom:6px;color:var(--text)}
+.feature-card p{font-size:.86rem;color:var(--muted)}
+@media(max-width:860px){.feature-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.feature-grid{grid-template-columns:1fr}}
+.formats{padding:50px 24px}
+.formats h2{text-align:center;font-size:1.8rem;margin-bottom:8px;color:var(--text)}
+.formats .lede{text-align:center;color:var(--muted);margin-bottom:36px}
+.format-search{max-width:420px;margin:0 auto 32px}
+.format-search input{width:100%;padding:13px 16px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:.92rem}
+.format-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:1000px;margin:0 auto}
+.format-group{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px}
+.format-group h3{font-size:.98rem;margin-bottom:8px;color:var(--text)}
+.format-chip{background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:5px 12px;font-size:.78rem;font-weight:600;margin:2px;cursor:pointer}
+.format-chip:hover{background:var(--primary);color:var(--primary-ink)}
+@media(max-width:860px){.format-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:540px){.format-grid{grid-template-columns:1fr}}
+.format-info{max-width:1000px;margin:18px auto 0;background:var(--surface-2);border:1px solid var(--border);border-radius:16px;padding:16px 20px;display:none}
+.format-info.show{display:block}
+.format-info strong{display:block;margin-bottom:4px;font-family:var(--font-display);color:var(--text)}
+.format-info span{color:var(--muted);font-size:.9rem}
+.youtube{padding:60px 24px}
+.youtube-card{max-width:760px;margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:26px;padding:40px 32px;text-align:center;box-shadow:var(--shadow)}
+.youtube-card h2{font-size:1.5rem;margin-bottom:8px;color:var(--text)}
+.youtube-card p{color:var(--muted);max-width:460px;margin:0 auto 22px}
+.yt-btn{display:inline-flex;align-items:center;gap:10px;background:#ff3b30;color:#fff;padding:13px 28px;border-radius:999px;font-weight:700;text-decoration:none}
+.site-footer{border-top:1px solid var(--border);padding:34px 24px;text-align:center;color:var(--muted);font-size:.86rem}
+.site-footer .f-brand{font-family:var(--font-display);color:var(--text);font-weight:700;margin-bottom:4px}
+.site-footer a{text-decoration:underline;color:var(--muted)}
+.toast-region{position:fixed;bottom:20px;inset-inline-end:20px;z-index:200;display:flex;flex-direction:column;gap:10px;max-width:320px}
+.toast{background:var(--surface);border:1px solid var(--border);border-inline-start:4px solid var(--accent);border-radius:10px;padding:12px 16px;box-shadow:var(--shadow);font-size:.86rem}
+.toast.error{border-inline-start-color:#e0564c}
+.steps{padding:10px 24px;max-width:1000px;margin:0 auto}
+.steps ol{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;list-style:none}
+.steps li{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;font-size:.85rem;color:var(--muted)}
+.steps li b{display:block;color:var(--text);font-family:var(--font-display);margin-bottom:4px}
+@media(max-width:760px){.steps ol{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:540px){.convert-row{flex-direction:column}.convert-arrow{transform:rotate(90deg)}.browse-btn,.convert-btn,.download-btn,.yt-btn{width:100%;justify-content:center}}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <svg viewBox="0 0 64 64" width="38" height="38" aria-hidden="true">
+        <circle cx="32" cy="34" r="22" fill="#fff" stroke="#232323" stroke-width="2.5"/>
+        <circle cx="14" cy="16" r="9" fill="#232323"/>
+        <circle cx="50" cy="16" r="9" fill="#232323"/>
+        <ellipse cx="21" cy="34" rx="8" ry="10" fill="#232323"/>
+        <ellipse cx="43" cy="34" rx="8" ry="10" fill="#232323"/>
+        <circle cx="21" cy="35" r="3" fill="#fff"/>
+        <circle cx="43" cy="35" r="3" fill="#fff"/>
+        <ellipse cx="32" cy="42" rx="4" ry="3" fill="#232323"/>
+      </svg>
+      <div>
+        <span class="brand-name">Panda Converter</span>
+        <span class="brand-powered" data-i18n="powered_by">لە لایەن ڕازن</span>
+      </div>
+    </div>
+    <div class="header-controls">
+      <select class="ctrl-select" id="langSelect">
+        <option value="ku">کوردی</option>
+        <option value="en">English</option>
+        <option value="ar">العربية</option>
+      </select>
+      <select class="ctrl-select" id="seasonSelect">
+        <option value="spring">🌸 بەھار</option>
+        <option value="summer">☀️ ھاوین</option>
+        <option value="autumn">🍂 پاییز</option>
+        <option value="winter">❄️ زستان</option>
+      </select>
+      <div class="theme-toggle">
+        <button id="lightBtn" aria-pressed="true">☀️</button>
+        <button id="darkBtn" aria-pressed="false">🌙</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <svg class="hero-panda" viewBox="0 0 64 64" aria-hidden="true">
+    <circle cx="32" cy="34" r="22" fill="#fff" stroke="#232323" stroke-width="2.5"/>
+    <circle cx="14" cy="16" r="9" fill="#232323"/><circle cx="50" cy="16" r="9" fill="#232323"/>
+    <ellipse cx="21" cy="34" rx="8" ry="10" fill="#232323"/><ellipse cx="43" cy="34" rx="8" ry="10" fill="#232323"/>
+    <circle cx="21" cy="35" r="3" fill="#fff"/><circle cx="43" cy="35" r="3" fill="#fff"/>
+    <ellipse cx="32" cy="42" rx="4" ry="3" fill="#232323"/>
+  </svg>
+  <h1 data-i18n="hero_title">Panda Converter</h1>
+  <p data-i18n="hero_sub">فایلەکانت بە خێرایی، سادەیی و جوانی بگۆڕە.</p>
+</section>
+
+<section class="steps">
+  <ol>
+    <li><b>١</b><span data-i18n="step1">فایلەکەت بار بکە</span></li>
+    <li><b>٢</b><span data-i18n="step2">فۆرماتی دەرچوون هەڵبژێرە</span></li>
+    <li><b>٣</b><span data-i18n="step3">کرتە لە گۆڕین بکە</span></li>
+    <li><b>٤</b><span data-i18n="step4">فایلەکە دابگرە</span></li>
+  </ol>
+</section>
+
+<section class="upload-section">
+  <div class="dropzone" id="dropzone" tabindex="0" role="button">
+    <svg viewBox="0 0 64 64" width="70" style="margin:0 auto 14px" aria-hidden="true">
+      <circle cx="32" cy="36" r="20" fill="#f3f8ee" stroke="#5f9a5a" stroke-width="2"/>
+      <circle cx="16" cy="20" r="8" fill="#232323"/><circle cx="48" cy="20" r="8" fill="#232323"/>
+      <ellipse cx="23" cy="36" rx="7" ry="9" fill="#232323"/><ellipse cx="41" cy="36" rx="7" ry="9" fill="#232323"/>
+      <circle cx="23" cy="37" r="2.6" fill="#f3f8ee"/><circle cx="41" cy="37" r="2.6" fill="#f3f8ee"/>
+    </svg>
+    <h3 data-i18n="drop_title">فایلەکەت لێرە دابنێ</h3>
+    <p class="sub" data-i18n="drop_sub">یان کرتە بکە بۆ گەڕان</p>
+    <button class="browse-btn" id="browseBtn" type="button">📁 <span data-i18n="choose_file">فایل هەڵبژێرە</span></button>
+    <input type="file" id="fileInput" class="visually-hidden" accept=".docx,.doc,.xlsx,.xls,.pptx,.ppt,.accdb,.mdb,.one,.pub,.vsdx,.vsd,.mpp,.pst">
+    <p class="formats-hint">DOCX • DOC • XLSX • XLS • PPTX • PPT • ACCDB • MDB • ONE • PUB • VSDX • VSD • MPP • PST</p>
+  </div>
+
+  <div class="file-card hidden" id="fileCard">
+    <div class="ico" id="fileIco">📄</div>
+    <div class="meta">
+      <div class="name" id="fileName"></div>
+      <div class="sub" id="fileSub"></div>
+    </div>
+    <button class="remove" id="removeFile">✕</button>
+  </div>
+
+  <div class="converter hidden" id="converter">
+    <h3 data-i18n="convert_title">فایلەکەت بگۆڕە</h3>
+    <div class="convert-row">
+      <div class="convert-col">
+        <label data-i18n="from">لە</label>
+        <span class="pill" id="fromFormat">—</span>
+      </div>
+      <div class="convert-arrow">⇄</div>
+      <div class="convert-col">
+        <label data-i18n="to">بۆ</label>
+        <select class="convert-select" id="toFormat"></select>
+      </div>
+    </div>
+    <button class="convert-btn" id="convertBtn" type="button">⚡ <span data-i18n="convert_file">فایل بگۆڕە</span></button>
+  </div>
+
+  <div class="progress-wrap hidden" id="progressWrap">
+    <svg class="progress-panda" viewBox="0 0 64 64" width="56" aria-hidden="true">
+      <circle cx="32" cy="34" r="22" fill="#fff" stroke="#232323" stroke-width="2.5"/>
+      <circle cx="14" cy="16" r="9" fill="#232323"/><circle cx="50" cy="16" r="9" fill="#232323"/>
+      <ellipse cx="21" cy="34" rx="8" ry="10" fill="#232323"/><ellipse cx="43" cy="34" rx="8" ry="10" fill="#232323"/>
+    </svg>
+    <h3 data-i18n="converting">فایلەکەت دەگۆڕدرێت...</h3>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <p class="progress-msg" id="progressMsg">—</p>
+  </div>
+
+  <div class="result-card hidden" id="resultCard">
+    <div class="check">✓</div>
+    <h3 data-i18n="done_title">گۆڕین سەرکەوتوو بوو!</h3>
+    <div class="result-files">
+      <strong id="resFrom"></strong><span>→</span><strong id="resTo"></strong>
+    </div>
+    <a class="download-btn" id="downloadBtn" href="#" download>⬇️ <span data-i18n="download">دابگرە</span></a>
+    <button class="again-btn" id="againBtn" type="button" data-i18n="convert_another">گۆڕینی فایلێکی تر</button>
+  </div>
+
+  <div class="error-card hidden" id="errorCard">
+    <div class="ico">⚠️</div>
+    <h3 id="errorTitle" data-i18n="err_generic_t">هەڵەیەک ڕوویدا</h3>
+    <p id="errorMsg" data-i18n="err_generic_d">تکایە دووبارە هەوڵ بدەرەوە.</p>
+    <button class="again-btn" id="errAgainBtn" type="button" data-i18n="start_over">لە سەرەتاوە دەستپێبکە</button>
+  </div>
+</section>
+
+<section class="features">
+  <h2 data-i18n="features_title">بۆچی Panda Converter؟</h2>
+  <p class="lede" data-i18n="features_sub">ئامرازێکی سادە و متمانەپێکراو بۆ گۆڕینی فایل</p>
+  <div class="feature-grid">
+    <div class="feature-card"><div class="emoji">⚡</div><h3 data-i18n="f1_t">خێرا</h3><p data-i18n="f1_d">پرۆسەیەکی سادە و کارا بۆ گۆڕینی فایل.</p></div>
+    <div class="feature-card"><div class="emoji">🔒</div><h3 data-i18n="f2_t">پارێزراو</h3><p data-i18n="f2_d">فایلەکانت لە ئامێرەکەتدا دەمێننەوە.</p></div>
+    <div class="feature-card"><div class="emoji">🌍</div><h3 data-i18n="f3_t">فرە زمان</h3><p data-i18n="f3_d">بەردەستە بە کوردی، ئینگلیزی و عەرەبی.</p></div>
+    <div class="feature-card"><div class="emoji">🎨</div><h3 data-i18n="f4_t">جوان</h3><p data-i18n="f4_d">دیزاینی وەرزی و دۆخی ڕووناک/تاریک.</p></div>
+  </div>
+</section>
+
+<section class="formats">
+  <h2 data-i18n="formats_title">فۆرماتە پشتگیریکراوەکان</h2>
+  <p class="lede" data-i18n="formats_sub">هەموو فایلەکانی مایکرۆسۆفت لە یەک شوێندا</p>
+  <div class="format-search">
+    <input type="text" id="formatSearch" placeholder="گەڕان بۆ فۆرمات...">
+  </div>
+  <div class="format-grid" id="formatGrid"></div>
+  <div class="format-info" id="formatInfo"></div>
+</section>
+
+<section class="youtube">
+  <div class="youtube-card">
+    <h2 data-i18n="yt_title">چێژت لە Panda Converter بینی؟</h2>
+    <p data-i18n="yt_sub">بەشداربە لە کەناڵی یوتیوبمان بۆ زیاتر ئامراز و فێرکاری.</p>
+    <a class="yt-btn" href="https://www.youtube.com/@pandatechkurd" target="_blank" rel="noopener">▶️ <span data-i18n="yt_btn">بەشداری بکە لە یوتیوب</span></a>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="f-brand">🐼 Panda Converter</div>
+  <div data-i18n="powered_by_f">لە لایەن ڕازنەوە دابینکراوە</div>
+  <p>© 2026 Panda Converter. <span data-i18n="rights">هەموو مافەکان پارێزراون.</span></p>
+  <p><a href="https://www.youtube.com/@pandatechkurd" target="_blank" rel="noopener" data-i18n="yt_sub_link">بەشداربە لە Panda Tech Kurd</a></p>
+</footer>
+
+<div class="toast-region" id="toastRegion"></div>
+
+<script>
+const API_URL = window.PANDA_API_URL || localStorage.getItem('panda_api_url') || '';
+const I18N = {
+  ku:{dir:'rtl',powered_by:'لە لایەن ڕازن',powered_by_f:'لە لایەن ڕازنەوە دابینکراوە',
+    hero_title:'Panda Converter',hero_sub:'فایلەکانت بە خێرایی، سادەیی و جوانی بگۆڕە.',
+    step1:'فایلەکەت بار بکە',step2:'فۆرماتی دەرچوون هەڵبژێرە',step3:'کرتە لە گۆڕین بکە',step4:'فایلەکە دابگرە',
+    drop_title:'فایلەکەت لێرە دابنێ',drop_sub:'یان کرتە بکە بۆ گەڕان',choose_file:'فایل هەڵبژێرە',
+    convert_title:'فایلەکەت بگۆڕە',from:'لە',to:'بۆ',convert_file:'فایل بگۆڕە',
+    converting:'فایلەکەت دەگۆڕدرێت...',download:'دابگرە',convert_another:'گۆڕینی فایلێکی تر',start_over:'لە سەرەتاوە',
+    done_title:'گۆڕین سەرکەوتوو بوو!',err_generic_t:'هەڵەیەک ڕوویدا',err_generic_d:'تکایە دووبارە هەوڵ بدەرەوە.',
+    err_unsupported_t:'فایلی پشتگیری نەکراو',err_unsupported_d:'ئەم جۆرە فایلە پشتگیری ناکرێت.',
+    err_size_t:'فایلەکە زۆر گەورەیە',err_size_d:'فایلی هەڵبژێردراو زۆر گەورەیە (زۆرترین 100 MB).',
+    err_empty_t:'فایلی بەتاڵ',err_empty_d:'ئەم فایلە بەتاڵە.',
+    err_fail_t:'گۆڕین سەرنەکەوت',err_fail_d:'شتێک هەڵەی ڕوویدا.',
+    err_server_t:'گۆڕین بەردەست نییە',err_server_d:'ئەم گۆڕینە پێویستی بە سێرڤەرە.',
+    features_title:'بۆچی Panda Converter؟',features_sub:'ئامرازێکی سادە و متمانەپێکراو',
+    f1_t:'خێرا',f1_d:'پرۆسەیەکی سادە و کارا بۆ گۆڕینی فایل.',
+    f2_t:'پارێزراو',f2_d:'فایلەکانت لە ئامێرەکەتدا دەمێننەوە.',
+    f3_t:'فرە زمان',f3_d:'بەردەستە بە کوردی، ئینگلیزی و عەرەبی.',
+    f4_t:'جوان',f4_d:'دیزاینی وەرزی و دۆخی ڕووناک/تاریک.',
+    formats_title:'فۆرماتە پشتگیریکراوەکان',formats_sub:'هەموو فایلەکانی مایکرۆسۆفت لە یەک شوێندا',
+    yt_title:'چێژت لە Panda Converter بینی؟',yt_sub:'بەشداربە لە کەناڵی یوتیوبمان بۆ زیاتر ئامراز و فێرکاری.',
+    yt_btn:'بەشداری بکە لە یوتیوب',rights:'هەموو مافەکان پارێزراون.',yt_sub_link:'بەشداربە لە Panda Tech Kurd',
+    toast_removed:'فایلەکە سڕایەوە',real_conversion:'گۆڕین سەرکەوتوو بوو.'},
+  en:{dir:'ltr',powered_by:'Powered by Razn',powered_by_f:'Powered by Razn',
+    hero_title:'Panda Converter',hero_sub:'Convert your files quickly, simply and beautifully.',
+    step1:'Upload your file',step2:'Choose output format',step3:'Click Convert',step4:'Download the result',
+    drop_title:'Drop your file here',drop_sub:'or click to browse',choose_file:'Choose File',
+    convert_title:'Convert Your File',from:'From',to:'To',convert_file:'Convert File',
+    converting:'Converting your file...',download:'Download',convert_another:'Convert Another File',start_over:'Start Over',
+    done_title:'Conversion Complete!',err_generic_t:'Something went wrong',err_generic_d:'Please try again.',
+    err_unsupported_t:'Unsupported File',err_unsupported_d:'This file format is not supported.',
+    err_size_t:'File Too Large',err_size_d:'The selected file is too large (100 MB max).',
+    err_empty_t:'Empty File',err_empty_d:'This file is empty.',
+    err_fail_t:'Conversion Failed',err_fail_d:'Something went wrong.',
+    err_server_t:'Conversion Not Available',err_server_d:'This conversion requires a server-side engine.',
+    features_title:'Why Panda Converter?',features_sub:'A simple and trustworthy file converter',
+    f1_t:'Fast',f1_d:'Simple and efficient file conversion.',
+    f2_t:'Private',f2_d:'Your files stay on your device.',
+    f3_t:'Multilingual',f3_d:'Available in Kurdish, English and Arabic.',
+    f4_t:'Beautiful',f4_d:'Seasonal themes and dark/light modes.',
+    formats_title:'Supported Formats',formats_sub:'All your Microsoft files in one place',
+    yt_title:'Enjoy Panda Converter?',yt_sub:'Subscribe to our YouTube channel for more tools and tutorials.',
+    yt_btn:'Subscribe on YouTube',rights:'All rights reserved.',yt_sub_link:'Subscribe to Panda Tech Kurd',
+    toast_removed:'File removed',real_conversion:'Conversion completed successfully.'},
+  ar:{dir:'rtl',powered_by:'بدعم من Razn',powered_by_f:'بدعم من Razn',
+    hero_title:'Panda Converter',hero_sub:'حوّل ملفاتك بسرعة وبساطة وجمال.',
+    step1:'ارفع ملفك',step2:'اختر صيغة الإخراج',step3:'اضغط تحويل',step4:'نزّل النتيجة',
+    drop_title:'أفلت ملفك هنا',drop_sub:'أو اضغط للتصفح',choose_file:'اختر ملفًا',
+    convert_title:'حوّل ملفك',from:'من',to:'إلى',convert_file:'تحويل',
+    converting:'جارٍ التحويل...',download:'تنزيل',convert_another:'تحويل ملف آخر',start_over:'البدء من جديد',
+    done_title:'اكتمل التحويل!',err_generic_t:'حدث خطأ',err_generic_d:'يرجى المحاولة مرة أخرى.',
+    err_unsupported_t:'ملف غير مدعوم',err_unsupported_d:'هذه الصيغة غير مدعومة.',
+    err_size_t:'الملف كبير جدًا',err_size_d:'الملف كبير جدًا (100 ميغابايت كحد أقصى).',
+    err_empty_t:'ملف فارغ',err_empty_d:'هذا الملف فارغ.',
+    err_fail_t:'فشل التحويل',err_fail_d:'حدث خطأ ما.',
+    err_server_t:'التحويل غير متاح',err_server_d:'يتطلب هذا التحويل محرك تحويل من الخادم.',
+    features_title:'لماذا Panda Converter؟',features_sub:'أداة بسيطة وموثوقة',
+    f1_t:'سريع',f1_d:'مسار عمل بسيط لتحويل الملفات.',
+    f2_t:'خاص',f2_d:'ملفاتك تبقى على جهازك.',
+    f3_t:'متعدد اللغات',f3_d:'بالكردية والإنجليزية والعربية.',
+    f4_t:'جميل',f4_d:'سمات موسمية وأوضاع داكنة/فاتحة.',
+    formats_title:'الصيغ المدعومة',formats_sub:'جميع ملفات مايكروسوفت في مكان واحد',
+    yt_title:'أعجبك Panda Converter؟',yt_sub:'اشترك في قناتنا على يوتيوب للمزيد.',
+    yt_btn:'اشترك على يوتيوب',rights:'جميع الحقوق محفوظة.',yt_sub_link:'اشترك في Panda Tech Kurd',
+    toast_removed:'تمت إزالة الملف',real_conversion:'تم التحويل بنجاح.'}
+};
+const FORMATS = {
+  docx:{cat:'word',label:'DOCX',desc:{ku:'فۆرماتی نوێی Word.',en:'Modern Word format.',ar:'صيغة Word الحديثة.'}},
+  doc:{cat:'word',label:'DOC',desc:{ku:'فۆرماتی کۆنی Word.',en:'Legacy Word format.',ar:'صيغة Word القديمة.'}},
+  xlsx:{cat:'excel',label:'XLSX',desc:{ku:'فۆرماتی نوێی Excel.',en:'Modern Excel format.',ar:'صيغة Excel الحديثة.'}},
+  xls:{cat:'excel',label:'XLS',desc:{ku:'فۆرماتی کۆنی Excel.',en:'Legacy Excel format.',ar:'صيغة Excel القديمة.'}},
+  pptx:{cat:'ppt',label:'PPTX',desc:{ku:'فۆرماتی نوێی PowerPoint.',en:'Modern PowerPoint.',ar:'صيغة PowerPoint الحديثة.'}},
+  ppt:{cat:'ppt',label:'PPT',desc:{ku:'فۆرماتی کۆنی PowerPoint.',en:'Legacy PowerPoint.',ar:'صيغة PowerPoint القديمة.'}},
+  accdb:{cat:'access',label:'ACCDB',desc:{ku:'داتابەیسی نوێی Access.',en:'Modern Access database.',ar:'قاعدة Access الحديثة.'}},
+  mdb:{cat:'access',label:'MDB',desc:{ku:'داتابەیسی کۆنی Access.',en:'Legacy Access database.',ar:'قاعدة Access القديمة.'}},
+  one:{cat:'onenote',label:'ONE',desc:{ku:'فایلی OneNote.',en:'OneNote file.',ar:'ملف OneNote.'}},
+  pub:{cat:'publisher',label:'PUB',desc:{ku:'فایلی Publisher.',en:'Publisher file.',ar:'ملف Publisher.'}},
+  vsdx:{cat:'visio',label:'VSDX',desc:{ku:'وێنەی نوێی Visio.',en:'Modern Visio drawing.',ar:'رسم Visio الحديث.'}},
+  vsd:{cat:'visio',label:'VSD',desc:{ku:'وێنەی کۆنی Visio.',en:'Legacy Visio drawing.',ar:'رسم Visio القديم.'}},
+  mpp:{cat:'project',label:'MPP',desc:{ku:'فایلی Project.',en:'Project file.',ar:'ملف Project.'}},
+  pst:{cat:'outlook',label:'PST',desc:{ku:'فایلی Outlook.',en:'Outlook data file.',ar:'ملف Outlook.'}}
+};
+const CATEGORIES = {
+  word:{icon:'📝',exts:['docx','doc'],label:{ku:'وۆرد',en:'Word',ar:'Word'}},
+  excel:{icon:'📊',exts:['xlsx','xls'],label:{ku:'ئێکسڵ',en:'Excel',ar:'Excel'}},
+  ppt:{icon:'📽️',exts:['pptx','ppt'],label:{ku:'پاوەرپۆینت',en:'PowerPoint',ar:'PowerPoint'}},
+  access:{icon:'🗄️',exts:['accdb','mdb'],label:{ku:'ئەکسێس',en:'Access',ar:'Access'}},
+  onenote:{icon:'🗒️',exts:['one'],label:{ku:'وان نۆت',en:'OneNote',ar:'OneNote'}},
+  publisher:{icon:'🖨️',exts:['pub'],label:{ku:'پەبلیشەر',en:'Publisher',ar:'Publisher'}},
+  visio:{icon:'📐',exts:['vsdx','vsd'],label:{ku:'ڤیزیۆ',en:'Visio',ar:'Visio'}},
+  project:{icon:'📅',exts:['mpp'],label:{ku:'پڕۆژە',en:'Project',ar:'Project'}},
+  outlook:{icon:'📧',exts:['pst'],label:{ku:'ئاوتلووک',en:'Outlook',ar:'Outlook'}}
+};
+const TARGETS = {
+  word:['pdf','txt','html','rtf','docx','doc'],
+  excel:['pdf','csv','html','xlsx','xls'],
+  ppt:['pdf','pptx','ppt'],
+  visio:['pdf','svg','vsdx','vsd'],
+  publisher:['pdf'],
+  access:['pdf'],
+  onenote:['pdf'],
+  project:['pdf'],
+  outlook:['pdf']
+};
+const LOCAL_CONVERSIONS = new Set(['xlsx->xls','xls->xlsx']);
+const MAX_SIZE = 100 * 1024 * 1024;
+let state = {lang:'ku',theme:'light',season:'spring',file:null,ext:null};
+const $ = id => document.getElementById(id);
+function applyLang(lang){
+  state.lang = lang;
+  const d = I18N[lang];
+  document.documentElement.lang = lang;
+  document.documentElement.dir = d.dir;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k = el.getAttribute('data-i18n');
+    if(d[k] !== undefined) el.textContent = d[k];
+  });
+  $('langSelect').value = lang;
+  localStorage.setItem('panda_lang', lang);
+  if(state.ext) refreshFileCard();
+  renderFormats($('formatSearch').value);
+}
+function applyTheme(theme){
+  state.theme = theme;
+  document.documentElement.setAttribute('data-theme', theme);
+  $('lightBtn').setAttribute('aria-pressed', theme === 'light');
+  $('darkBtn').setAttribute('aria-pressed', theme === 'dark');
+  localStorage.setItem('panda_theme', theme);
+}
+function applySeason(season){
+  state.season = season;
+  document.documentElement.setAttribute('data-season', season);
+  $('seasonSelect').value = season;
+  localStorage.setItem('panda_season', season);
+}
+function toast(msg, type){
+  const el = document.createElement('div');
+  el.className = 'toast' + (type === 'error' ? ' error' : '');
+  el.textContent = msg;
+  $('toastRegion').appendChild(el);
+  setTimeout(()=>el.remove(), 4200);
+}
+function humanSize(b){
+  if(b < 1024) return b + ' B';
+  if(b < 1024*1024) return (b/1024).toFixed(1) + ' KB';
+  return (b/1024/1024).toFixed(2) + ' MB';
+}
+function sanitize(t){
+  const d = document.createElement('div');
+  d.textContent = t;
+  return d.innerHTML;
+}
+function extOf(name){
+  const m = /\.([a-z0-9]+)$/i.exec(name || '');
+  return m ? m[1].toLowerCase() : '';
+}
+function handleFile(file){
+  resetResults();
+  const ext = extOf(file.name);
+  const d = I18N[state.lang];
+  if(!FORMATS[ext]){ showError(d.err_unsupported_t, d.err_unsupported_d); return; }
+  if(file.size > MAX_SIZE){ showError(d.err_size_t, d.err_size_d); return; }
+  if(file.size === 0){ showError(d.err_empty_t, d.err_empty_d); return; }
+  state.file = file;
+  state.ext = ext;
+  refreshFileCard();
+  buildConverter(ext);
+  $('fileCard').classList.remove('hidden');
+  $('converter').classList.remove('hidden');
+  $('dropzone').classList.add('hidden');
+}
+function refreshFileCard(){
+  if(!state.file) return;
+  const cat = FORMATS[state.ext].cat;
+  $('fileIco').textContent = CATEGORIES[cat].icon;
+  $('fileName').textContent = sanitize(state.file.name);
+  $('fileSub').textContent = CATEGORIES[cat].label[state.lang] + ' · ' + humanSize(state.file.size) + ' · ' + FORMATS[state.ext].label;
+}
+function buildConverter(ext){
+  const cat = FORMATS[ext].cat;
+  $('fromFormat').textContent = FORMATS[ext].label;
+  const sel = $('toFormat');
+  sel.innerHTML = '';
+  (TARGETS[cat] || []).filter(e => e !== ext).forEach(e=>{
+    const opt = document.createElement('option');
+    opt.value = e;
+    opt.textContent = FORMATS[e] ? FORMATS[e].label : e.toUpperCase();
+    sel.appendChild(opt);
+  });
+}
+function resetAll(){
+  state.file = null;
+  state.ext = null;
+  $('fileCard').classList.add('hidden');
+  $('converter').classList.add('hidden');
+  $('progressWrap').classList.add('hidden');
+  $('resultCard').classList.add('hidden');
+  $('errorCard').classList.add('hidden');
+  $('dropzone').classList.remove('hidden');
+  $('fileInput').value = '';
+}
+function resetResults(){
+  $('progressWrap').classList.add('hidden');
+  $('resultCard').classList.add('hidden');
+  $('errorCard').classList.add('hidden');
+}
+function showError(t, m){
+  $('progressWrap').classList.add('hidden');
+  $('resultCard').classList.add('hidden');
+  $('errorTitle').textContent = t;
+  $('errorMsg').textContent = m;
+  $('errorCard').classList.remove('hidden');
+  toast(m, 'error');
+}
+['dragenter','dragover'].forEach(ev => $('dropzone').addEventListener(ev, e=>{ e.preventDefault(); $('dropzone').classList.add('dragover'); }));
+['dragleave','drop'].forEach(ev => $('dropzone').addEventListener(ev, e=>{ e.preventDefault(); $('dropzone').classList.remove('dragover'); }));
+$('dropzone').addEventListener('drop', e=>{ const f = e.dataTransfer.files[0]; if(f) handleFile(f); });
+$('dropzone').addEventListener('click', ()=> $('fileInput').click());
+$('dropzone').addEventListener('keydown', e=>{ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); $('fileInput').click(); } });
+$('browseBtn').addEventListener('click', e=>{ e.stopPropagation(); $('fileInput').click(); });
+$('fileInput').addEventListener('change', e=>{ if(e.target.files[0]) handleFile(e.target.files[0]); });
+$('removeFile').addEventListener('click', ()=>{ resetAll(); toast(I18N[state.lang].toast_removed); });
+$('againBtn').addEventListener('click', resetAll);
+$('errAgainBtn').addEventListener('click', resetAll);
+function convertLocalXlsxXls(file, from, to){
+  return new Promise((resolve, reject)=>{
+    const r = new FileReader();
+    r.onload = e=>{
+      try{
+        const data = new Uint8Array(e.target.result);
+        const wb = XLSX.read(data, {type:'array'});
+        const bt = to === 'xls' ? 'biff8' : 'xlsx';
+        const out = XLSX.write(wb, {bookType:bt, type:'array'});
+        const mime = to === 'xls' ? 'application/vnd.ms-excel' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+        resolve(new Blob([out], {type:mime}));
+      }catch(err){ reject(err); }
+    };
+    r.onerror = ()=> reject(new Error('read-failed'));
+    r.readAsArrayBuffer(file);
+  });
+}
+async function convertViaServer(file, to){
+  if(!API_URL) throw new Error('no-api');
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('target', to);
+  const res = await fetch(API_URL.replace(/\/$/,'') + '/api/convert', {method:'POST', body:fd});
+  if(!res.ok){
+    const err = await res.json().catch(()=>({detail:'Server error'}));
+    throw new Error(err.detail || 'Server error');
+  }
+  return await res.blob();
+}
+async function performConversion(file, from, to){
+  const key = from + '->' + to;
+  if(LOCAL_CONVERSIONS.has(key)) return await convertLocalXlsxXls(file, from, to);
+  if(API_URL) return await convertViaServer(file, to);
+  throw new Error('no-engine');
+}
+$('convertBtn').addEventListener('click', async ()=>{
+  const d = I18N[state.lang];
+  const from = state.ext;
+  const to = $('toFormat').value;
+  resetResults();
+  $('progressWrap').classList.remove('hidden');
+  $('convertBtn').disabled = true;
+  $('progressFill').style.width = '0%';
+  const stageMsgs = {
+    ku:['فایلەکە ئامادە دەکرێت...','بەڵگەنامەکە دەخوێنرێتەوە...','ناوەڕۆک پرۆسێس دەکرێت...','فۆرمات دەگۆڕدرێت...','کۆتایی پێهێنان...'],
+    en:['Preparing file...','Reading document...','Processing content...','Converting format...','Finalizing file...'],
+    ar:['جارٍ تجهيز الملف...','جارٍ قراءة المستند...','معالجة المحتوى...','تحويل الصيغة...','إنهاء الملف...']
+  };
+  const msgs = stageMsgs[state.lang];
+  try{
+    for(let i = 0; i < msgs.length - 1; i++){
+      $('progressMsg').textContent = msgs[i];
+      $('progressFill').style.width = ((i+1)/msgs.length*100) + '%';
+      await new Promise(r => setTimeout(r, 360));
+    }
+    const blob = await performConversion(state.file, from, to);
+    $('progressMsg').textContent = msgs[msgs.length-1];
+    $('progressFill').style.width = '100%';
+    await new Promise(r => setTimeout(r, 300));
+    const base = state.file.name.replace(/\.[^.]+$/, '');
+    const outName = base + '.' + to;
+    $('progressWrap').classList.add('hidden');
+    $('resFrom').textContent = FORMATS[from].label;
+    $('resTo').textContent = to.toUpperCase();
+    const url = URL.createObjectURL(blob);
+    $('downloadBtn').href = url;
+    $('downloadBtn').download = outName;
+    $('resultCard').classList.remove('hidden');
+    toast(d.real_conversion);
+  }catch(err){
+    $('progressWrap').classList.add('hidden');
+    if(err.message === 'no-engine'){
+      showError(d.err_server_t, d.err_server_d);
+    }else{
+      showError(d.err_fail_t, d.err_fail_d);
+    }
+  }finally{
+    $('convertBtn').disabled = false;
+  }
+});
+function renderFormats(filter){
+  filter = (filter || '').trim().toLowerCase();
+  const grid = $('formatGrid');
+  grid.innerHTML = '';
+  Object.entries(CATEGORIES).forEach(([ck, cat])=>{
+    const matches = !filter ||
+      cat.label[state.lang].toLowerCase().includes(filter) ||
+      ck.includes(filter) ||
+      cat.exts.some(e => e.includes(filter) || FORMATS[e].label.toLowerCase().includes(filter));
+    if(!matches) return;
+    const card = document.createElement('div');
+    card.className = 'format-group';
+    const h = document.createElement('h3');
+    h.textContent = cat.icon + ' ' + cat.label[state.lang];
+    card.appendChild(h);
+    const exts = document.createElement('div');
+    cat.exts.forEach(e=>{
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'format-chip';
+      chip.textContent = FORMATS[e].label;
+      chip.addEventListener('click', ()=> showFormatInfo(e));
+      exts.appendChild(chip);
+    });
+    card.appendChild(exts);
+    grid.appendChild(card);
+  });
+}
+function showFormatInfo(ext){
+  const box = $('formatInfo');
+  box.innerHTML = '<strong>' + sanitize(FORMATS[ext].label) + '</strong><span>' + sanitize(FORMATS[ext].desc[state.lang]) + '</span>';
+  box.classList.add('show');
+}
+$('formatSearch').addEventListener('input', e => renderFormats(e.target.value));
+$('langSelect').addEventListener('change', e => applyLang(e.target.value));
+$('seasonSelect').addEventListener('change', e => applySeason(e.target.value));
+$('lightBtn').addEventListener('click', ()=> applyTheme('light'));
+$('darkBtn').addEventListener('click', ()=> applyTheme('dark'));
+(function init(){
+  const sl = localStorage.getItem('panda_lang') || 'ku';
+  const st = localStorage.getItem('panda_theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  const ss = localStorage.getItem('panda_season') || 'spring';
+  applyTheme(st);
+  applySeason(ss);
+  applyLang(sl);
+  renderFormats('');
+})();
+<\/script>
+</body>
+</html>
